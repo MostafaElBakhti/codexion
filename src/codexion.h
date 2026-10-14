@@ -1,9 +1,11 @@
 #ifndef CODEXION_H
 # define CODEXION_H
+#include <limits.h>
 
 #include <stdio.h>
 
-typedef struct slak
+
+typedef struct s_struct
 {
     int number_of_coders;
     int time_to_burnout;
@@ -13,6 +15,13 @@ typedef struct slak
     int number_of_compiles_required;
     int dongle_cooldown;
     char *scheduler;
-}   t_slak
+}   t_struct;
+
+
+int parse_arguments(int argc , char **argv, t_struct *data);
+int is_valid_number(char *s);
+int convert_number(char *str, int *result);
+static int fill_numbers(char **argv, t_struct *data);
+int str_cmp(const char *s1, const char *s2);
 
 #endif
