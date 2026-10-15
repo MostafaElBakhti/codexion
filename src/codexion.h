@@ -21,7 +21,6 @@ typedef struct s_struct
 int parse_arguments(int argc , char **argv, t_struct *data);
 int is_valid_number(char *s);
 int convert_number(char *str, int *result);
-static int fill_numbers(char **argv, t_struct *data);
 int str_cmp(const char *s1, const char *s2);
 
 #endif

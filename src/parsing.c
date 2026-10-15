@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mel-bakh <mel-bakh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/10/15 01:05:30 by mel-bakh          #+#    #+#             */
+/*   Updated: 2026/10/15 01:05:35 by mel-bakh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 #include <stdlib.h>
 
@@ -82,5 +94,6 @@ int parse_arguments(int argc, char **argv, t_struct *data)
 
     if (str_cmp(argv[8], "fifo") != 0 && str_cmp(argv[8], "edf") != 0)
         return 1;
+    data->scheduler = argv[8];
     return 0;
 }
