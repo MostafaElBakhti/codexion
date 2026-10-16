@@ -15,6 +15,7 @@
 int main(int argc , char **argv)
 {
     t_struct data;
+    t_simulation    sim;
 
     if (argc != 9)
     {
@@ -35,7 +36,7 @@ int main(int argc , char **argv)
     printf("time_to_refactor: %d\n", data.time_to_refactor);
     printf("number_of_compiles_required: %d\n", data.number_of_compiles_required);
     printf("dongle_cooldown: %d\n", data.dongle_cooldown);
-    
+    sim.config = data;
     return (0);
 
 }

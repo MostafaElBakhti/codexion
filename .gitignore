@@ -1,0 +1,66 @@
+# Compiled C/C++ files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.d
+*.pdb
+
+# Project executables
+/codexion
+/src/codexion
+/src/test
+
+# Build directories and generated build-system files
+/build/
+/bin/
+/obj/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Test, coverage, profiling, and crash output
+*.gcda
+*.gcno
+*.gcov
+coverage/
+gmon.out
+callgrind.out.*
+core
+core.*
+
+# Local caches and temporary files
+.cache/
+.clangd/
+.ccls-cache/
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Editor and IDE settings
+.vscode/
+.idea/
+.vs/
+*.code-workspace
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

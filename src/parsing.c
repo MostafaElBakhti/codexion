@@ -77,11 +77,23 @@ int is_valid_number(char *s)
     }
     return 0;
 }
-
+static int validate_config(t_struct *data)
+{
+    if (data->number_of_coders <= 0)
+        return (1);
+    if (data->time_to_burnout <= 0
+        || data->time_to_compile <= 0
+        || data->time_to_debug <= 0
+        || data->time_to_refactor <= 0)
+        return (1);
+    if (data->number_of_compiles_required <= 0)
+        return (1);
+    return (0);
+}
 
 int parse_arguments(int argc, char **argv, t_struct *data)
 {
-    if ( !argv || !data)
+    if (argc != 9 || !argv || !data)
         return 1;
     int i = 1;
     while(i < argc - 1){
@@ -91,7 +103,8 @@ int parse_arguments(int argc, char **argv, t_struct *data)
     }
     if (fill_numbers(argv, data) != 0)
         return 1;
-
+    if (validate_config(data) != 0)
+        return 1;
     if (str_cmp(argv[8], "fifo") != 0 && str_cmp(argv[8], "edf") != 0)
         return 1;
     data->scheduler = argv[8];
