@@ -15,6 +15,7 @@ int init_coders(t_simulation *sim)
             (i + sim->config.number_of_coders - 1)
             % sim->config.number_of_coders
         ];
+        sim->coders[i].sim = sim;
         i++;
     }
     return 0;

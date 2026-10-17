@@ -13,7 +13,7 @@
 #include "codexion.h"
 #include <stdlib.h>
 
-static int fill_numbers(char **argv, t_struct *data)
+static int fill_numbers(char **argv, t_data *data)
 {
     if (convert_number(argv[1], &data->number_of_coders))
         return (1);
@@ -77,7 +77,7 @@ int is_valid_number(char *s)
     }
     return 0;
 }
-static int validate_config(t_struct *data)
+static int validate_config(t_data *data)
 {
     if (data->number_of_coders <= 0)
         return (1);
@@ -91,7 +91,7 @@ static int validate_config(t_struct *data)
     return (0);
 }
 
-int parse_arguments(int argc, char **argv, t_struct *data)
+int parse_arguments(int argc, char **argv, t_data *data)
 {
     if (argc != 9 || !argv || !data)
         return 1;
