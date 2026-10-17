@@ -1,10 +1,12 @@
 #ifndef CODEXION_H
 # define CODEXION_H
 #include <limits.h>
+# include <pthread.h>
 
 #include <stdio.h>
+# include <stdlib.h>
 
-
+// # data parsed
 typedef struct s_struct
 {
     int number_of_coders;
@@ -17,15 +19,26 @@ typedef struct s_struct
     char *scheduler;
 }   t_struct;
 
+// ## dongles
+typedef struct s_dongle
+{
+    int id;
+}   t_dongle;
+
+// ## coders
 typedef struct s_coder
 {
     int id;
+    struct s_dongle     *left;
+    struct s_dongle     *right;
 }   t_coder;
 
+// ## simulation
 typedef struct s_simulation
 {
     t_struct    config;
     t_coder     *coders;
+    t_dongle    *dongles;
     int         stop;
 }   t_simulation;
 
@@ -34,5 +47,6 @@ int is_valid_number(char *s);
 int convert_number(char *str, int *result);
 int str_cmp(const char *s1, const char *s2);
 int init_coders(t_simulation *sim);
+int init_dongles(t_simulation *sim);
 
 #endif
