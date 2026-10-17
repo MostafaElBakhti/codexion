@@ -50,5 +50,6 @@ int convert_number(char *str, int *result);
 int str_cmp(const char *s1, const char *s2);
 int init_coders(t_simulation *sim);
 int init_dongles(t_simulation *sim);
+void *coder_routine(void *arg);
 
 #endif
