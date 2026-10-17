@@ -14,7 +14,6 @@
 
 int main(int argc , char **argv)
 {
-    t_struct data;
     t_simulation    sim;
 
     if (argc != 9)
@@ -23,7 +22,7 @@ int main(int argc , char **argv)
         return(1);
     }
     
-    if (parse_arguments(argc, argv, &data) != 0)
+    if (parse_arguments(argc, argv, &sim.config) != 0)
     {
         printf("Error: Invalid arguments\n");
         return (1);
@@ -37,7 +36,6 @@ int main(int argc , char **argv)
     // printf("number_of_compiles_required: %d\n", data.number_of_compiles_required);
     // printf("dongle_cooldown: %d\n", data.dongle_cooldown);
     
-    sim.config = data;
     sim.stop = 0;
     if (init_dongles(&sim) != 0)
         return (1);
