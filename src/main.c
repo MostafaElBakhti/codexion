@@ -28,14 +28,12 @@ int main(int argc, char **argv)
         free(sim.dongles);
         return (1);
     }
-    if (pthread_create(&sim.coders[0].thread, NULL,
-            coder_routine, &sim.coders[0]) != 0)
+    if (start_threads(&sim) != 0)
     {
         free(sim.coders);
         free(sim.dongles);
         return (1);
     }
-    pthread_join(sim.coders[0].thread, NULL);
     free(sim.coders);
     free(sim.dongles);
     return (0);
