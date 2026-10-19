@@ -6,7 +6,7 @@ void *coder_routine(void *arg)
 
     coder = (t_coder *)arg;
     printf("Hello from coder %d\n", coder->id);
-    sleep(2);
+    sleep(3);
     printf("Coder %d finished\n", coder->id);
     return (NULL);
 }
@@ -24,13 +24,15 @@ int start_threads(t_simulation *sim)
             break ;
         i++;
     }
-    // j = 0;
-    // while (j < i)
-    // {
-    //     pthread_join(sim->coders[j].thread, NULL);
-    //     j++;
-    // }
-    // if (i != sim->config.number_of_coders)
-    //     return (1);
+    j = 0;
+    while (j < i)
+    {
+        pthread_join(sim->coders[j].thread, NULL);
+        j++;
+    }
+    if (i != sim->config.number_of_coders)
+        return (1);
     return (0);
 }
+
+// # Mutex
