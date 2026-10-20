@@ -54,5 +54,6 @@ int str_cmp(const char *s1, const char *s2);
 int init_coders(t_simulation *sim);
 int init_dongles(t_simulation *sim);
 void *coder_routine(void *arg);
+int try_acquire_dongle(t_dongle *dongle);
 
 #endif
