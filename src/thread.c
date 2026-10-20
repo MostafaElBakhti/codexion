@@ -5,9 +5,15 @@ void *coder_routine(void *arg)
     t_coder *coder;
 
     coder = (t_coder *)arg;
-    printf("Hello from coder %d\n", coder->id);
-    sleep(3);
-    printf("Coder %d finished\n", coder->id);
+    if (coder->id == 1 || coder->id == 2)
+    {
+        printf("Coder %d wants Dongle 1\n", coder->id);
+        pthread_mutex_lock(&coder->sim->dongles[0].mutex);
+        printf("Coder %d LOCKED Dongle 1\n", coder->id);
+        sleep(2);
+        printf("Coder %d UNLOCKING Dongle 1\n", coder->id);
+        pthread_mutex_unlock(&coder->sim->dongles[0].mutex);
+    }
     return (NULL);
 }
 

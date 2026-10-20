@@ -1,6 +1,7 @@
 #ifndef CODEXION_H
 # define CODEXION_H
 #include <limits.h>
+#include <unistd.h>
 # include <pthread.h>
 
 #include <stdio.h>
@@ -22,7 +23,9 @@ typedef struct s_data
 // ## dongles
 typedef struct s_dongle
 {
-    int id;
+    int     id;
+    int     available;
+    pthread_mutex_t mutex;
 }   t_dongle;
 
 // ## coders

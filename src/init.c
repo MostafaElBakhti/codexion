@@ -33,6 +33,16 @@ int init_dongles(t_simulation *sim)
     while (i < sim->config.number_of_coders)
     {
         sim->dongles[i].id = i + 1;
+        sim->dongles[i].available = 1;
+
+        if (pthread_mutex_init(&sim->dongles[i].mutex, NULL) != 0)
+        {
+            while (--i >= 0)
+                pthread_mutex_destroy(&sim->dongles[i].mutex);
+            free(sim->dongles);
+            sim->dongles = NULL;
+            return (1);
+        }
         i++;
     }
     return (0);
