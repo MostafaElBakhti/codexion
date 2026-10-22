@@ -23,15 +23,15 @@ typedef struct s_data
 // ## dongles
 typedef struct s_dongle
 {
-    int     id;
-    int     available;
+    int             id;
+    int             available;
     pthread_mutex_t mutex;
 }   t_dongle;
 
 // ## coders
 typedef struct s_coder
 {
-    int id;
+    int                 id;
     struct s_dongle     *left;
     struct s_dongle     *right;
     pthread_t           thread;
@@ -41,7 +41,7 @@ typedef struct s_coder
 // ## simulation
 typedef struct s_simulation
 {
-    t_data    config;
+    t_data      config;
     t_coder     *coders;
     t_dongle    *dongles;
     int         stop;
@@ -55,5 +55,6 @@ int init_coders(t_simulation *sim);
 int init_dongles(t_simulation *sim);
 void *coder_routine(void *arg);
 int try_acquire_dongle(t_dongle *dongle);
+long get_time_ms(void);
 
 #endif
