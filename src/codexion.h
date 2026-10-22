@@ -48,6 +48,14 @@ typedef struct s_simulation
     int         stop;
 }   t_simulation;
 
+typedef struct s_request
+{
+    int     coder_id;
+    long    arrival_time;
+    long    deadline;
+}   t_request;
+
+
 int parse_arguments(int argc , char **argv, t_data *data);
 int is_valid_number(char *s);
 int convert_number(char *str, int *result);
