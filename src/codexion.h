@@ -26,6 +26,7 @@ typedef struct s_dongle
     int             id;
     int             available;
     pthread_mutex_t mutex;
+    long            cooldown_until;
 }   t_dongle;
 
 // ## coders
@@ -56,5 +57,7 @@ int init_dongles(t_simulation *sim);
 void *coder_routine(void *arg);
 int try_acquire_dongle(t_dongle *dongle);
 long get_time_ms(void);
+int release_dongle(t_dongle *dongle, t_simulation *sim);
+int try_acquire_dongle(t_dongle *dongle);
 
 #endif
