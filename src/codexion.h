@@ -20,13 +20,30 @@ typedef struct s_data
     char *scheduler;
 }   t_data;
 
+typedef struct s_request
+{
+    int     coder_id;
+    long    request_time;
+    long    deadline;
+}   t_request;
+
+
+// ## heap
+typedef struct s_heap
+{
+    t_request   *requests;
+    int         request_count;
+    int         max_requests;
+}   t_heap;
+
 // ## dongles
 typedef struct s_dongle
 {
     int             id;
     int             available;
-    pthread_mutex_t mutex;
     long            cooldown_until;
+    pthread_mutex_t mutex;
+    t_heap          heap;
 }   t_dongle;
 
 // ## coders
@@ -48,12 +65,6 @@ typedef struct s_simulation
     int         stop;
 }   t_simulation;
 
-typedef struct s_request
-{
-    int     coder_id;
-    long    arrival_time;
-    long    deadline;
-}   t_request;
 
 
 int parse_arguments(int argc , char **argv, t_data *data);
@@ -67,5 +78,6 @@ int try_acquire_dongle(t_dongle *dongle);
 long get_time_ms(void);
 int release_dongle(t_dongle *dongle, t_simulation *sim);
 int try_acquire_dongle(t_dongle *dongle);
+int init_heap(t_heap *heap, int max_requests);
 
 #endif
