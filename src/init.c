@@ -34,16 +34,27 @@ int init_dongles(t_simulation *sim)
     {
         sim->dongles[i].id = i + 1;
         sim->dongles[i].available = 1;
-
+        sim->dongles[i].cooldown_until = 0;
         if (pthread_mutex_init(&sim->dongles[i].mutex, NULL) != 0)
+            break ;
+        if (init_heap(&sim->dongles[i].heap,
+                sim->config.number_of_coders) != 0)
         {
-            while (--i >= 0)
-                pthread_mutex_destroy(&sim->dongles[i].mutex);
-            free(sim->dongles);
-            sim->dongles = NULL;
-            return (1);
+            pthread_mutex_destroy(&sim->dongles[i].mutex);
+            break ;
         }
         i++;
+    }
+    if (i != sim->config.number_of_coders)
+    {
+        while (--i >= 0)
+        {
+            destroy_heap(&sim->dongles[i].heap);
+            pthread_mutex_destroy(&sim->dongles[i].mutex);
+        }
+        free(sim->dongles);
+        sim->dongles = NULL;
+        return (1);
     }
     return (0);
 }

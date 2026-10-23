@@ -67,17 +67,19 @@ typedef struct s_simulation
 
 
 
-int parse_arguments(int argc , char **argv, t_data *data);
-int is_valid_number(char *s);
-int convert_number(char *str, int *result);
-int str_cmp(const char *s1, const char *s2);
-int init_coders(t_simulation *sim);
-int init_dongles(t_simulation *sim);
-void *coder_routine(void *arg);
-int try_acquire_dongle(t_dongle *dongle);
-long get_time_ms(void);
-int release_dongle(t_dongle *dongle, t_simulation *sim);
-int try_acquire_dongle(t_dongle *dongle);
-int init_heap(t_heap *heap, int max_requests);
+int     parse_arguments(int argc , char **argv, t_data *data);
+int     is_valid_number(char *s);
+int     convert_number(char *str, int *result);
+int     str_cmp(const char *s1, const char *s2);
+int     init_coders(t_simulation *sim);
+int     init_dongles(t_simulation *sim);
+void    *coder_routine(void *arg);
+int     try_acquire_dongle(t_dongle *dongle);
+long    get_time_ms(void);
+int     release_dongle(t_dongle *dongle, t_simulation *sim);
+int     try_acquire_dongle(t_dongle *dongle);
+int     init_heap(t_heap *heap, int max_requests);
+void    destroy_heap(t_heap *heap);
+int     heap_push(t_heap *heap, t_request request, char *scheduler);
 
 #endif

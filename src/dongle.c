@@ -53,3 +53,20 @@ int try_acquire_dongle(t_dongle *dongle)
         return (-1);
     return (acquired);
 }
+
+void destroy_dongles(t_simulation *sim)
+{
+    int i;
+
+    if (!sim->dongles)
+        return ;
+    i = 0;
+    while (i < sim->config.number_of_coders)
+    {
+        destroy_heap(&sim->dongles[i].heap);
+        pthread_mutex_destroy(&sim->dongles[i].mutex);
+        i++;
+    }
+    free(sim->dongles);
+    sim->dongles = NULL;
+}
