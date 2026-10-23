@@ -3,17 +3,15 @@
 void *coder_routine(void *arg)
 {
     t_coder *coder;
+    long    deadline;
 
     coder = (t_coder *)arg;
-    if (coder->id == 1 || coder->id == 2 || coder->id == 3|| coder->id == 4)
-    {
-        printf("Coder %d wants Dongle 1\n", coder->id);
-        pthread_mutex_lock(&coder->sim->dongles[0].mutex);
-        printf("Coder %d LOCKED Dongle 1\n", coder->id);
-        sleep(2);
-        printf("Coder %d UNLOCKING Dongle 1\n", coder->id);
-        pthread_mutex_unlock(&coder->sim->dongles[0].mutex);
-    }
+    deadline = coder->last_compile_start
+        + coder->sim->config.time_to_burnout;
+
+    printf("Coder %d deadline: %ld ms\n",
+        coder->id, deadline - coder->sim->start_time);
+
     return (NULL);
 }
 
@@ -21,6 +19,13 @@ int start_threads(t_simulation *sim)
 {
     int i;
     int j;
+
+    i = 0;
+    while (i < sim->config.number_of_coders)
+    {
+        sim->coders[i].last_compile_start = sim->start_time;
+        i++;
+    }
 
     i = 0;
     while (i < sim->config.number_of_coders)

@@ -1,25 +1,10 @@
 #include "codexion.h"
 
-int try_acquire_dongle(t_dongle *dongle)
-{
-    int acquired;
-
-    acquired = 0;
-    pthread_mutex_lock(&dongle->mutex);
-    if (dongle->available == 1)
-    {
-        dongle->available = 0;
-        acquired = 1;
-    }
-    pthread_mutex_unlock(&dongle->mutex);
-    return (acquired);
-}
-
 int release_dongle(t_dongle *dongle, t_simulation *sim)
 {
     long now;
 
-    now = get_time_ms()
+    now = get_time_ms();
     if (now < 0)
         return (1);
     if (pthread_mutex_lock(&dongle->mutex) != 0 )

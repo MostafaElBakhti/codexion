@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <unistd.h>
 # include <pthread.h>
+#include <string.h>
 
 #include <stdio.h>
 # include <stdlib.h>
@@ -54,6 +55,7 @@ typedef struct s_coder
     struct s_dongle     *right;
     pthread_t           thread;
     struct s_simulation *sim;
+    long                last_compile_start;
 }   t_coder;
 
 // ## simulation
@@ -63,6 +65,7 @@ typedef struct s_simulation
     t_coder     *coders;
     t_dongle    *dongles;
     int         stop;
+    long        start_time;
 }   t_simulation;
 
 
@@ -77,9 +80,9 @@ void    *coder_routine(void *arg);
 int     try_acquire_dongle(t_dongle *dongle);
 long    get_time_ms(void);
 int     release_dongle(t_dongle *dongle, t_simulation *sim);
-int     try_acquire_dongle(t_dongle *dongle);
 int     init_heap(t_heap *heap, int max_requests);
 void    destroy_heap(t_heap *heap);
 int     heap_push(t_heap *heap, t_request request, char *scheduler);
+int     start_threads(t_simulation *sim);
 
 #endif
