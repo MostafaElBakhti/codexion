@@ -44,6 +44,7 @@ typedef struct s_dongle
     int             available;
     long            cooldown_until;
     pthread_mutex_t mutex;
+    pthread_cond_t  cond;
     t_heap          heap;
 }   t_dongle;
 

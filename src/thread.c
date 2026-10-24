@@ -2,15 +2,31 @@
 
 void *coder_routine(void *arg)
 {
-    t_coder *coder;
-    long    deadline;
+    t_coder     *coder;
+    t_dongle    *dongle;
+    t_request   request;
+    int         result;
 
     coder = (t_coder *)arg;
-    deadline = coder->last_compile_start
+    dongle = coder->right;
+
+    request.coder_id = coder->id;
+    request.request_time = get_time_ms();
+    if (request.request_time < 0)
+        return (NULL);
+    request.deadline = coder->last_compile_start
         + coder->sim->config.time_to_burnout;
 
-    printf("Coder %d deadline: %ld ms\n",
-        coder->id, deadline - coder->sim->start_time);
+    if (pthread_mutex_lock(&dongle->mutex) != 0)
+        return (NULL);
+
+    result = heap_push(&dongle->heap, request,
+            coder->sim->config.scheduler);
+
+    if (pthread_mutex_unlock(&dongle->mutex) != 0)
+        return (NULL);
+    if (result != 0)
+        return (NULL);
 
     return (NULL);
 }
