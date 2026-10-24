@@ -63,3 +63,43 @@ int heap_push(t_heap *heap, t_request request, char *scheduler)
     }
     return (0);
 }
+
+// int heap_pop(t_heap *heap, t_request *request, char *scheduler)
+// {
+//     int         i;
+//     int         left;
+//     int         right;
+//     int         smallest;
+//     t_request   temp;
+
+//     if (!heap || !request || heap->request_count == 0)
+//         return (1);
+//     *request = heap->requests[0];
+//     heap->request_count--;
+//     if (heap->request_count == 0)
+//         return (0);
+//     heap->requests[0] = heap->requests[heap->request_count];
+
+//     i = 0;
+//     while (1)
+//     {
+//         left = 2 * i + 1;
+//         right = 2 * i + 2;
+//         smallest = i;
+//         if (left < heap->request_count
+//             && higher_priority(heap->requests[left],
+//                 heap->requests[smallest], scheduler))
+//             smallest = left;
+//         if (right < heap->request_count
+//             && higher_priority(heap->requests[right],
+//                 heap->requests[smallest], scheduler))
+//             smallest = right;
+//         if (smallest == i)
+//             break ;
+//         temp = heap->requests[i];
+//         heap->requests[i] = heap->requests[smallest];
+//         heap->requests[smallest] = temp;
+//         i = smallest;
+//     }
+//     return (0);
+// }
