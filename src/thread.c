@@ -6,6 +6,8 @@ void *coder_routine(void *arg)
     t_dongle    *dongle;
     t_request   request;
     int         result;
+    int     can_take;
+    long    now;
 
     coder = (t_coder *)arg;
     dongle = coder->right;
@@ -23,10 +25,23 @@ void *coder_routine(void *arg)
     result = heap_push(&dongle->heap, request,
             coder->sim->config.scheduler);
 
+    can_take = 0;
+    if (result == 0)
+    {
+        now = get_time_ms();
+        if (now >= 0
+            && dongle->heap.requests[0].coder_id == coder->id
+            && dongle->available == 1
+            && now >= dongle->cooldown_until)
+            can_take = 1;
+    }
     if (pthread_mutex_unlock(&dongle->mutex) != 0)
         return (NULL);
     if (result != 0)
         return (NULL);
+
+    printf("Coder %d can take Dongle %d: %d\n",
+        coder->id, dongle->id, can_take);
 
     return (NULL);
 }

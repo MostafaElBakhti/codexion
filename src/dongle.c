@@ -49,6 +49,7 @@ void destroy_dongles(t_simulation *sim)
     while (i < sim->config.number_of_coders)
     {
         destroy_heap(&sim->dongles[i].heap);
+        pthread_cond_destroy(&sim->dongles[i].cond);
         pthread_mutex_destroy(&sim->dongles[i].mutex);
         i++;
     }

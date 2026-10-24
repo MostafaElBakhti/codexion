@@ -38,6 +38,6 @@ int main(int argc, char **argv)
         return (1);
     }
     free(sim.coders);
-    free(sim.dongles);
+    destroy_dongles(&sim);
     return (0);
 }

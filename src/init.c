@@ -37,9 +37,15 @@ int init_dongles(t_simulation *sim)
         sim->dongles[i].cooldown_until = 0;
         if (pthread_mutex_init(&sim->dongles[i].mutex, NULL) != 0)
             break ;
+        if (pthread_cond_init(&sim->dongles[i].cond, NULL) != 0)
+        {
+            pthread_mutex_destroy(&sim->dongles[i].mutex);
+            break ;
+        }
         if (init_heap(&sim->dongles[i].heap,
                 sim->config.number_of_coders) != 0)
         {
+            pthread_cond_destroy(&sim->dongles[i].cond);
             pthread_mutex_destroy(&sim->dongles[i].mutex);
             break ;
         }
@@ -50,6 +56,7 @@ int init_dongles(t_simulation *sim)
         while (--i >= 0)
         {
             destroy_heap(&sim->dongles[i].heap);
+            pthread_cond_destroy(&sim->dongles[i].cond);
             pthread_mutex_destroy(&sim->dongles[i].mutex);
         }
         free(sim->dongles);

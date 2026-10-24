@@ -85,5 +85,6 @@ int     init_heap(t_heap *heap, int max_requests);
 void    destroy_heap(t_heap *heap);
 int     heap_push(t_heap *heap, t_request request, char *scheduler);
 int     start_threads(t_simulation *sim);
+void    destroy_dongles(t_simulation *sim);
 
 #endif
