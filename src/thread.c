@@ -1,4 +1,29 @@
 #include "codexion.h"
+#include <errno.h>
+
+static int wait_for_cooldown(t_dongle *dongle, long wait_ms)
+{
+    struct timespec timeout;
+    int             result;
+
+    if (clock_gettime(CLOCK_REALTIME, &timeout) != 0)
+        return (1);
+
+    timeout.tv_sec += wait_ms / 1000;
+    timeout.tv_nsec += (wait_ms % 1000) * 1000000L;
+
+    if (timeout.tv_nsec >= 1000000000L)
+    {
+        timeout.tv_sec++;
+        timeout.tv_nsec -= 1000000000L;
+    }
+
+    result = pthread_cond_timedwait(&dongle->cond,
+            &dongle->mutex, &timeout);
+
+    return (result != 0 && result != ETIMEDOUT);
+}
+
 
 void *coder_routine(void *arg)
 {
@@ -25,56 +50,60 @@ void *coder_routine(void *arg)
 
     result = heap_push(&dongle->heap, request,
             coder->sim->config.scheduler);
-    if (result == 0)
+    if (result != 0)
     {
-        while (dongle->available == 0)
-        {
-            if (pthread_cond_wait(&dongle->cond,
-                    &dongle->mutex) != 0)
-            {
-                pthread_mutex_unlock(&dongle->mutex);
-                return (NULL);
-            }
-        }
+        pthread_mutex_unlock(&dongle->mutex);
+        return (NULL);
     }
+
     can_take = 0;
-    if (result == 0)
+    while (!can_take)
     {
         now = get_time_ms();
-        if (now >= 0
-            && dongle->heap.requests[0].coder_id == coder->id
-            && dongle->available == 1
-            && now >= dongle->cooldown_until)
+        if (now < 0)
+            break ;
 
-            can_take = 1;
-    }
-    if (can_take)
-    {
-        if (heap_pop(&dongle->heap, &winner,
-                coder->sim->config.scheduler) != 0)
-            can_take = 0;
-        else
+        if (dongle->available == 1
+            && now >= dongle->cooldown_until
+            && dongle->heap.requests[0].coder_id == coder->id)
+        {
+            if (heap_pop(&dongle->heap, &winner,
+                    coder->sim->config.scheduler) != 0)
+                break ;
             dongle->available = 0;
+            can_take = 1;
+        }
+        else if (dongle->available == 1
+            && now < dongle->cooldown_until)
+        {
+            if (wait_for_cooldown(dongle,
+                    dongle->cooldown_until - now) != 0)
+                break ;
+        }
+        else if (pthread_cond_wait(&dongle->cond,
+                &dongle->mutex) != 0)
+            break ;
     }
-    pthread_cond_broadcast(&dongle->cond);
 
     if (pthread_mutex_unlock(&dongle->mutex) != 0)
         return (NULL);
 
-    if (result != 0)
+    if (!can_take)
         return (NULL);
 
-    if (can_take)
-    {
-        printf("Coder %d acquired Dongle %d\n",
-            coder->id, dongle->id);
+    printf("%ld ms: Coder %d acquired Dongle %d\n",
+        get_time_ms() - coder->sim->start_time,
+        coder->id, dongle->id);
 
-        if (release_dongle(dongle, coder->sim) != 0)
-            return (NULL);
+    
+    
+    if (release_dongle(dongle, coder->sim) != 0)
+        return (NULL);
 
-        printf("Coder %d released Dongle %d\n",
-            coder->id, dongle->id);
-    }
+    printf("%ld ms: Coder %d released Dongle %d\n",
+        get_time_ms() - coder->sim->start_time,
+        coder->id, dongle->id);
+
     return (NULL);
 }
 
@@ -108,5 +137,6 @@ int start_threads(t_simulation *sim)
         return (1);
     return (0);
 }
+
 
 // # Mutex
