@@ -63,8 +63,8 @@ typedef struct s_coder
 typedef struct s_simulation
 {
     t_data      config;
-    t_coder     *coders;
     t_dongle    *dongles;
+    t_coder     *coders;
     int         stop;
     long        start_time;
 }   t_simulation;

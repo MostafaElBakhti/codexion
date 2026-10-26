@@ -1,28 +1,28 @@
 #include "codexion.h"
 #include <errno.h>
 
-static int wait_for_cooldown(t_dongle *dongle, long wait_ms)
-{
-    struct timespec timeout;
-    int             result;
+// static int wait_for_cooldown(t_dongle *dongle, long wait_ms)
+// {
+//     struct timespec timeout;
+//     int             result;
 
-    if (clock_gettime(CLOCK_REALTIME, &timeout) != 0)
-        return (1);
+//     if (clock_gettime(CLOCK_REALTIME, &timeout) != 0)
+//         return (1);
 
-    timeout.tv_sec += wait_ms / 1000;
-    timeout.tv_nsec += (wait_ms % 1000) * 1000000L;
+//     timeout.tv_sec += wait_ms / 1000;
+//     timeout.tv_nsec += (wait_ms % 1000) * 1000000L;
 
-    if (timeout.tv_nsec >= 1000000000L)
-    {
-        timeout.tv_sec++;
-        timeout.tv_nsec -= 1000000000L;
-    }
+//     if (timeout.tv_nsec >= 1000000000L)
+//     {
+//         timeout.tv_sec++;
+//         timeout.tv_nsec -= 1000000000L;
+//     }
 
-    result = pthread_cond_timedwait(&dongle->cond,
-            &dongle->mutex, &timeout);
+//     result = pthread_cond_timedwait(&dongle->cond,
+//             &dongle->mutex, &timeout);
 
-    return (result != 0 && result != ETIMEDOUT);
-}
+//     return (result != 0 && result != ETIMEDOUT);
+// }
 
 
 void *coder_routine(void *arg)
