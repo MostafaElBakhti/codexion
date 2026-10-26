@@ -2,19 +2,24 @@
 
 int release_dongle(t_dongle *dongle, t_simulation *sim)
 {
-    long now;
+    long    now;
+    int     result;
 
+    if (pthread_mutex_lock(&dongle->mutex) != 0)
+        return (1);
     now = get_time_ms();
     if (now < 0)
+    {
+        pthread_mutex_unlock(&dongle->mutex);
         return (1);
-    if (pthread_mutex_lock(&dongle->mutex) != 0 )
-        return (1);
+    }
     dongle->available = 1;
-    dongle->cooldown_until = now + sim->config.dongle_cooldown;
-    if (pthread_mutex_unlock(&dongle->mutex)!= 0 )
+    dongle->cooldown_until = now
+        + sim->config.dongle_cooldown;
+    result = pthread_cond_broadcast(&dongle->cond);
+    if (pthread_mutex_unlock(&dongle->mutex) != 0)
         return (1);
-    return (0);
-
+    return (result != 0);
 }
 
 int try_acquire_dongle(t_dongle *dongle)

@@ -30,11 +30,17 @@ int main(int argc, char **argv)
     }
 
     sim.start_time = get_time_ms();
+    if (sim.start_time < 0)
+    {
+        free(sim.coders);
+        destroy_dongles(&sim);
+        return (1);
+    }
     
     if (start_threads(&sim) != 0)
     {
         free(sim.coders);
-        free(sim.dongles);
+        destroy_dongles(&sim);
         return (1);
     }
     free(sim.coders);
