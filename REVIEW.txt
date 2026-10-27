@@ -1,0 +1,44 @@
+Codexion two-dongle acquisition review
+Date: 2026-10-27
+
+Changes
+- Each coder queues one request in each neighboring dongle's FIFO/EDF heap.
+- An arbiter mutex and ordered dongle mutexes make both heap insertion and
+  two-dongle reservation atomic. A coder reserves only when it leads both
+  heaps, both dongles are available, and both cooldowns have expired.
+- Waiters sleep on a condition variable; timed waits cover cooldown. Release,
+  cancellation, and stop broadcast to wake affected waiters.
+- Cooperative stop cancels queued requests. Thread creation failure stops and
+  joins already started threads. Both dongles remain held for the compile time.
+- Heap removal was added for cancellation. Logging is serialized. Initialization
+  and cleanup were corrected. Source files were made 42 Norm compliant.
+
+Tests after final refactor
+- make: PASS with -Wall -Wextra -Werror -pthread.
+- norminette src/*.c src/*.h: PASS for every source and header.
+- 180 matrix runs: 1, 2, 3, 4, 10, 100 coders; FIFO and EDF; cooldown 0, 3,
+  20 ms; five repetitions each. PASS: expected compile count, no timeout,
+  adjacent compile starts separated by compile time plus cooldown (2 ms
+  timestamp tolerance).
+- 50 randomized stress runs over 2, 3, 4, 10, and 100 coders, both schedulers,
+  varying compile times and cooldowns: PASS.
+- Waiting request cancellation test: PASS; both heap entries removed after stop.
+- Heap FIFO/EDF ordering and arbitrary removal test: PASS.
+- Valgrind leak/error check: PASS for 100 coders and cancellation test.
+- AddressSanitizer/UndefinedBehaviorSanitizer: PASS for 100 coders with leak
+  detection disabled. LeakSanitizer could not run under this environment's ptrace.
+- Helgrind: PASS for 10 coders. At 100 coders it reported condition-variable
+  warnings inside pthread_cond_timedwait, without a data-race diagnostic.
+  ThreadSanitizer could not start because of an unexpected memory mapping.
+- git diff --check: PASS.
+
+Remaining limitations
+- The program performs one compile attempt per coder. Debug/refactor cycles,
+  repeated compiles, completion stopping, and the burnout monitor are not yet
+  implemented. EDF starvation freedom over repeated cycles is not claimed.
+- A single coder has one physical dongle and exits without compiling. The
+  subject's burnout behavior for this case awaits the monitor.
+- Cancellation is cooperative via the simulation stop flag. Asynchronous
+  pthread_cancel is not supported.
+- Real-time clock changes can affect pthread_cond_timedwait deadlines, although
+  dongle cooldown itself is checked against the monotonic clock.

@@ -1,143 +1,73 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   thread.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mel-bakh <mel-bakh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/10/27 00:00:00 by mel-bakh          #+#    #+#             */
+/*   Updated: 2026/10/27 00:00:00 by mel-bakh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
-#include <errno.h>
 
-// static int wait_for_cooldown(t_dongle *dongle, long wait_ms)
-// {
-//     struct timespec timeout;
-//     int             result;
-
-//     if (clock_gettime(CLOCK_REALTIME, &timeout) != 0)
-//         return (1);
-
-//     timeout.tv_sec += wait_ms / 1000;
-//     timeout.tv_nsec += (wait_ms % 1000) * 1000000L;
-
-//     if (timeout.tv_nsec >= 1000000000L)
-//     {
-//         timeout.tv_sec++;
-//         timeout.tv_nsec -= 1000000000L;
-//     }
-
-//     result = pthread_cond_timedwait(&dongle->cond,
-//             &dongle->mutex, &timeout);
-
-//     return (result != 0 && result != ETIMEDOUT);
-// }
-
-
-void *coder_routine(void *arg)
+void	stop_simulation(t_simulation *sim)
 {
-    t_coder     *coder;
-    t_dongle    *dongle;
-    t_request   request;
-    int         result;
-    int         can_take;
-    long        now;
-    t_request   winner;
-
-    coder = (t_coder *)arg;
-    dongle = coder->right;
-
-    request.coder_id = coder->id;
-    request.request_time = get_time_ms();
-    if (request.request_time < 0)
-        return (NULL);
-    request.deadline = coder->last_compile_start
-        + coder->sim->config.time_to_burnout;
-
-    if (pthread_mutex_lock(&dongle->mutex) != 0)
-        return (NULL);
-
-    result = heap_push(&dongle->heap, request,
-            coder->sim->config.scheduler);
-    if (result != 0)
-    {
-        pthread_mutex_unlock(&dongle->mutex);
-        return (NULL);
-    }
-
-    can_take = 0;
-    while (!can_take)
-    {
-        now = get_time_ms();
-        if (now < 0)
-            break ;
-
-        if (dongle->available == 1
-            && now >= dongle->cooldown_until
-            && dongle->heap.requests[0].coder_id == coder->id)
-        {
-            if (heap_pop(&dongle->heap, &winner,
-                    coder->sim->config.scheduler) != 0)
-                break ;
-            dongle->available = 0;
-            can_take = 1;
-        }
-        else if (dongle->available == 1
-            && now < dongle->cooldown_until)
-        {
-            if (wait_for_cooldown(dongle,
-                    dongle->cooldown_until - now) != 0)
-                break ;
-        }
-        else if (pthread_cond_wait(&dongle->cond,
-                &dongle->mutex) != 0)
-            break ;
-    }
-
-    if (pthread_mutex_unlock(&dongle->mutex) != 0)
-        return (NULL);
-
-    if (!can_take)
-        return (NULL);
-
-    printf("%ld ms: Coder %d acquired Dongle %d\n",
-        get_time_ms() - coder->sim->start_time,
-        coder->id, dongle->id);
-
-    
-    
-    if (release_dongle(dongle, coder->sim) != 0)
-        return (NULL);
-
-    printf("%ld ms: Coder %d released Dongle %d\n",
-        get_time_ms() - coder->sim->start_time,
-        coder->id, dongle->id);
-
-    return (NULL);
+	pthread_mutex_lock(&sim->arbiter_mutex);
+	sim->stop = 1;
+	pthread_cond_broadcast(&sim->arbiter_cond);
+	pthread_mutex_unlock(&sim->arbiter_mutex);
 }
 
-int start_threads(t_simulation *sim)
+void	log_state(t_coder *coder, char *state)
 {
-    int i;
-    int j;
+	t_simulation	*sim;
 
-    i = 0;
-    while (i < sim->config.number_of_coders)
-    {
-        sim->coders[i].last_compile_start = sim->start_time;
-        i++;
-    }
-
-    i = 0;
-    while (i < sim->config.number_of_coders)
-    {
-        if (pthread_create(&sim->coders[i].thread, NULL,
-                coder_routine, &sim->coders[i]) != 0)
-            break ;
-        i++;
-    }
-    j = 0;
-    while (j < i)
-    {
-        pthread_join(sim->coders[j].thread, NULL);
-        j++;
-    }
-    if (i != sim->config.number_of_coders)
-        return (1);
-    return (0);
+	sim = coder->sim;
+	pthread_mutex_lock(&sim->log_mutex);
+	printf("%ld %d %s\n", get_time_ms() - sim->start_time,
+		coder->id, state);
+	pthread_mutex_unlock(&sim->log_mutex);
 }
 
+static int	compile_once(t_coder *coder)
+{
+	t_simulation	*sim;
+	long			end;
+	int				result;
 
-// # Mutex
-// # Mutex
+	sim = coder->sim;
+	log_state(coder, "has taken a dongle");
+	log_state(coder, "has taken a dongle");
+	log_state(coder, "is compiling");
+	end = get_time_ms() + sim->config.time_to_compile;
+	if (pthread_mutex_lock(&sim->arbiter_mutex) != 0)
+		return (1);
+	result = 0;
+	while (!sim->stop && get_time_ms() < end && !result)
+		result = wait_until(sim, end);
+	pthread_mutex_unlock(&sim->arbiter_mutex);
+	if (release_pair(coder) != 0)
+		result = 1;
+	return (result);
+}
+
+void	*coder_routine(void *arg)
+{
+	t_coder	*coder;
+	int		result;
+
+	coder = (t_coder *)arg;
+	result = acquire_pair(coder);
+	if (result == 2)
+		return (NULL);
+	if (result == 0)
+		result = compile_once(coder);
+	if (result != 0)
+	{
+		stop_simulation(coder->sim);
+		return ((void *)1);
+	}
+	return (NULL);
+}

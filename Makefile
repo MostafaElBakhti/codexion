@@ -11,8 +11,12 @@ SRC_FILES := main.c \
 	parsing.c \
 	init.c \
 	dongle.c \
+	reservation.c \
 	heap.c \
+	heap_order.c \
 	thread.c \
+	acquire.c \
+	start.c \
 	time.c
 
 SRCS := $(addprefix $(SRC_DIR)/,$(SRC_FILES))
