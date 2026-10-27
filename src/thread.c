@@ -140,3 +140,4 @@ int start_threads(t_simulation *sim)
 
 
 // # Mutex
+// # Mutex
