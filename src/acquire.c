@@ -57,7 +57,7 @@ int	acquire_pair(t_coder *coder)
 	t_simulation	*sim;
 	int				result;
 
-	if (coder->left == coder->right)
+	if (coder->left == coder->right) // in case 1 dongle
 		return (2);
 	sim = coder->sim;
 	if (pthread_mutex_lock(&sim->arbiter_mutex) != 0)
