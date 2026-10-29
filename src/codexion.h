@@ -38,6 +38,7 @@ typedef struct s_request
 	int		coder_id;
 	long	request_time;
 	long	deadline;
+	unsigned long	sequence;
 }	t_request;
 
 typedef struct s_heap
@@ -64,6 +65,7 @@ typedef struct s_coder
 	pthread_t			thread;
 	struct s_simulation	*sim;
 	long				last_compile_start;
+	int					completed_compiles;
 }	t_coder;
 
 typedef struct s_simulation
@@ -72,6 +74,8 @@ typedef struct s_simulation
 	t_dongle		*dongles;
 	t_coder			*coders;
 	int				stop;
+	int				completed_coders;
+	unsigned long	next_sequence;
 	long			start_time;
 	pthread_mutex_t	arbiter_mutex;
 	pthread_cond_t	arbiter_cond;
@@ -88,6 +92,7 @@ long	get_time_ms(void);
 int		acquire_pair(t_coder *coder);
 int		release_pair(t_coder *coder);
 int		queue_pair(t_coder *coder, t_request request);
+int		submit_pair(t_coder *coder);
 int		reserve_pair(t_coder *coder, long now);
 void	cancel_pair(t_coder *coder);
 void	lock_pair(t_coder *coder);
@@ -95,6 +100,7 @@ void	unlock_pair(t_coder *coder);
 void	stop_simulation(t_simulation *sim);
 int		wait_until(t_simulation *sim, long deadline);
 void	log_state(t_coder *coder, char *state);
+void	*monitor_routine(void *arg);
 int		init_heap(t_heap *heap, int max_requests);
 void	destroy_heap(t_heap *heap);
 int		heap_push(t_heap *heap, t_request request, char *scheduler);

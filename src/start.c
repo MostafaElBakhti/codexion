@@ -12,7 +12,7 @@
 
 #include "codexion.h"
 
-static int	join_threads(t_simulation *sim, int count)
+static int	join_threads(t_simulation *sim, int count, pthread_t monitor)
 {
 	int		failed;
 	int		i;
@@ -29,12 +29,16 @@ static int	join_threads(t_simulation *sim, int count)
 			failed = 1;
 		i++;
 	}
+	result = NULL;
+	if (pthread_join(monitor, &result) != 0 || result)
+		failed = 1;
 	return (failed);
 }
 
 int	start_threads(t_simulation *sim)
 {
-	int	i;
+	int			i;
+	pthread_t	monitor;
 
 	i = 0;
 	while (i < sim->config.number_of_coders)
@@ -42,6 +46,8 @@ int	start_threads(t_simulation *sim)
 		sim->coders[i].last_compile_start = sim->start_time;
 		i++;
 	}
+	if (pthread_create(&monitor, NULL, monitor_routine, sim) != 0)
+		return (1);
 	i = 0;
 	while (i < sim->config.number_of_coders)
 	{
@@ -50,5 +56,5 @@ int	start_threads(t_simulation *sim)
 			break ;
 		i++;
 	}
-	return (join_threads(sim, i));
+	return (join_threads(sim, i, monitor));
 }

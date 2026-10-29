@@ -24,6 +24,16 @@ static long	next_cooldown(t_coder *coder, long now)
 	return (next);
 }
 
+static int	start_compile(t_coder *coder, long now)
+{
+	coder->last_compile_start = now;
+	log_state(coder, "has taken a dongle");
+	log_state(coder, "has taken a dongle");
+	log_state(coder, "is compiling");
+	pthread_cond_broadcast(&coder->sim->arbiter_cond);
+	return (0);
+}
+
 static int	wait_for_pair(t_coder *coder)
 {
 	t_simulation	*sim;
@@ -37,10 +47,7 @@ static int	wait_for_pair(t_coder *coder)
 		if (now < 0)
 			return (1);
 		if (reserve_pair(coder, now))
-		{
-			coder->last_compile_start = now;
-			return (0);
-		}
+			return (start_compile(coder, now));
 		cooldown = next_cooldown(coder, now);
 		if (cooldown && wait_until(sim, cooldown) != 0)
 			return (1);
@@ -48,27 +55,50 @@ static int	wait_for_pair(t_coder *coder)
 				&sim->arbiter_mutex) != 0)
 			return (1);
 	}
-	return (1);
+	return (2);
+}
+
+static int	acquire_single(t_coder *coder)
+{
+	t_simulation	*sim;
+	int			result;
+
+	sim = coder->sim;
+	if (pthread_mutex_lock(&sim->arbiter_mutex) != 0)
+		return (1);
+	if (!sim->stop)
+	{
+		pthread_mutex_lock(&coder->left->mutex);
+		coder->left->available = 0;
+		pthread_mutex_unlock(&coder->left->mutex);
+		log_state(coder, "has taken a dongle");
+	}
+	result = 0;
+	while (!sim->stop && !result)
+		result = pthread_cond_wait(&sim->arbiter_cond,
+				&sim->arbiter_mutex);
+	pthread_mutex_unlock(&sim->arbiter_mutex);
+	if (result)
+		return (1);
+	return (2);
 }
 
 int	acquire_pair(t_coder *coder)
 {
-	t_request		request;
 	t_simulation	*sim;
 	int				result;
 
-	if (coder->left == coder->right) // in case 1 dongle
-		return (2);
+	if (coder->left == coder->right)
+		return (acquire_single(coder));
 	sim = coder->sim;
 	if (pthread_mutex_lock(&sim->arbiter_mutex) != 0)
 		return (1);
-	request.request_time = get_time_ms();
-	request.coder_id = coder->id;
-	request.deadline = coder->last_compile_start
-		+ sim->config.time_to_burnout;
-	result = (request.request_time < 0);
-	if (!result)
-		result = queue_pair(coder, request);
+	if (sim->stop)
+	{
+		pthread_mutex_unlock(&sim->arbiter_mutex);
+		return (2);
+	}
+	result = submit_pair(coder);
 	if (!result)
 	{
 		result = wait_for_pair(coder);

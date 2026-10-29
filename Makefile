@@ -15,6 +15,8 @@ SRC_FILES := main.c \
 	heap.c \
 	heap_order.c \
 	thread.c \
+	state.c \
+	monitor.c \
 	acquire.c \
 	start.c \
 	time.c

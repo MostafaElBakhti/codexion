@@ -12,6 +12,22 @@
 
 #include "codexion.h"
 
+int	submit_pair(t_coder *coder)
+{
+	t_request		request;
+	t_simulation	*sim;
+
+	sim = coder->sim;
+	request.request_time = get_time_ms();
+	if (request.request_time < 0)
+		return (1);
+	request.coder_id = coder->id;
+	request.sequence = sim->next_sequence++;
+	request.deadline = coder->last_compile_start
+		+ sim->config.time_to_burnout;
+	return (queue_pair(coder, request));
+}
+
 int	queue_pair(t_coder *coder, t_request request)
 {
 	t_simulation	*sim;

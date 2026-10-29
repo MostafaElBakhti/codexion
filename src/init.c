@@ -28,6 +28,7 @@ int	init_coders(t_simulation *sim)
 		sim->coders[i].right = &sim->dongles[i];
 		sim->coders[i].left = &sim->dongles[(i + count - 1) % count];
 		sim->coders[i].sim = sim;
+		sim->coders[i].completed_compiles = 0;
 		i++;
 	}
 	return (0);

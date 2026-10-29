@@ -18,15 +18,19 @@ int	higher_priority(t_request a, t_request b, char *scheduler)
 	{
 		if (a.request_time != b.request_time)
 			return (a.request_time < b.request_time);
+		return (a.sequence < b.sequence);
 	}
 	else
 	{
 		if (a.deadline != b.deadline)
 			return (a.deadline < b.deadline);
+		/* Equal deadlines favor alternating seats, allowing parallel pairs. */
+		if (a.coder_id % 2 != b.coder_id % 2)
+			return (a.coder_id % 2 == 0);
 		if (a.request_time != b.request_time)
 			return (a.request_time < b.request_time);
 	}
-	return (a.coder_id < b.coder_id);
+	return (a.sequence < b.sequence);
 }
 
 static void	heap_swap(t_request *a, t_request *b)
