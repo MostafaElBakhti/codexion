@@ -16,8 +16,12 @@ int	submit_pair(t_coder *coder)
 {
 	t_request		request;
 	t_simulation	*sim;
+	int				result;
 
 	sim = coder->sim;
+	result = wait_initial_turn(coder);
+	if (result)
+		return (result);
 	request.request_time = get_time_ms();
 	if (request.request_time < 0)
 		return (1);
@@ -25,7 +29,13 @@ int	submit_pair(t_coder *coder)
 	request.sequence = sim->next_sequence++;
 	request.deadline = coder->last_compile_start
 		+ sim->config.time_to_burnout;
-	return (queue_pair(coder, request));
+	result = queue_pair(coder, request);
+	if (!result && coder->completed_compiles == 0 && coder->id % 2 == 0)
+	{
+		sim->initial_even_requests++;
+		pthread_cond_broadcast(&sim->arbiter_cond);
+	}
+	return (result);
 }
 
 int	queue_pair(t_coder *coder, t_request request)

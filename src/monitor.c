@@ -88,5 +88,7 @@ void	*monitor_routine(void *arg)
 		pthread_cond_broadcast(&sim->arbiter_cond);
 	}
 	pthread_mutex_unlock(&sim->arbiter_mutex);
-	return ((void *)(long)(status < 0));
+	if (status < 0)
+		return ((void *)1);
+	return (NULL);
 }

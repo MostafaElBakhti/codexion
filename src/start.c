@@ -12,6 +12,27 @@
 
 #include "codexion.h"
 
+/* Called with arbiter_mutex held, before the request enters either heap. */
+int	wait_initial_turn(t_coder *coder)
+{
+	t_simulation	*sim;
+
+	sim = coder->sim;
+	if (coder->completed_compiles != 0)
+		return (0);
+	while (coder->id % 2 != 0
+		&& sim->initial_even_requests < sim->config.number_of_coders / 2
+		&& !sim->stop)
+	{
+		if (pthread_cond_wait(&sim->arbiter_cond,
+				&sim->arbiter_mutex) != 0)
+			return (1);
+	}
+	if (sim->stop)
+		return (2);
+	return (0);
+}
+
 static int	join_threads(t_simulation *sim, int count, pthread_t monitor)
 {
 	int		failed;

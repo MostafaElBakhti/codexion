@@ -75,6 +75,7 @@ typedef struct s_simulation
 	t_coder			*coders;
 	int				stop;
 	int				completed_coders;
+	int				initial_even_requests;
 	unsigned long	next_sequence;
 	long			start_time;
 	pthread_mutex_t	arbiter_mutex;
@@ -105,6 +106,7 @@ int		init_heap(t_heap *heap, int max_requests);
 void	destroy_heap(t_heap *heap);
 int		heap_push(t_heap *heap, t_request request, char *scheduler);
 int		start_threads(t_simulation *sim);
+int		wait_initial_turn(t_coder *coder);
 void	destroy_dongles(t_simulation *sim);
 int		heap_pop(t_heap *heap, t_request *request, char *scheduler);
 int		heap_remove(t_heap *heap, int coder_id, char *scheduler);
