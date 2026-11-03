@@ -6,7 +6,7 @@
 /*   By: mel-bakh <mel-bakh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/27 00:00:00 by mel-bakh          #+#    #+#             */
-/*   Updated: 2026/10/28 00:30:47 by mel-bakh         ###   ########.fr       */
+/*   Updated: 2026/11/01 19:45:39 by mel-bakh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static int	wait_for_pair(t_coder *coder)
 static int	acquire_single(t_coder *coder)
 {
 	t_simulation	*sim;
-	int			result;
+	int				result;
 
 	sim = coder->sim;
 	if (pthread_mutex_lock(&sim->arbiter_mutex) != 0)

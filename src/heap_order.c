@@ -6,7 +6,7 @@
 /*   By: mel-bakh <mel-bakh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/27 00:00:00 by mel-bakh          #+#    #+#             */
-/*   Updated: 2026/10/27 00:00:00 by mel-bakh         ###   ########.fr       */
+/*   Updated: 2026/11/01 19:45:51 by mel-bakh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ int	higher_priority(t_request a, t_request b, char *scheduler)
 	{
 		if (a.deadline != b.deadline)
 			return (a.deadline < b.deadline);
-		/* Equal deadlines favor alternating seats, allowing parallel pairs. */
 		if (a.coder_id % 2 != b.coder_id % 2)
 			return (a.coder_id % 2 == 0);
 		if (a.request_time != b.request_time)

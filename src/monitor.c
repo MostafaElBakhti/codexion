@@ -6,7 +6,7 @@
 /*   By: mel-bakh <mel-bakh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/29 00:00:00 by mel-bakh          #+#    #+#             */
-/*   Updated: 2026/10/30 23:59:01 by mel-bakh         ###   ########.fr       */
+/*   Updated: 2026/11/01 19:47:29 by mel-bakh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ static int	monitor_step(t_simulation *sim)
 void	*monitor_routine(void *arg)
 {
 	t_simulation	*sim;
-	int			status;
+	int				status;
 
 	sim = (t_simulation *)arg;
 	if (pthread_mutex_lock(&sim->arbiter_mutex) != 0)

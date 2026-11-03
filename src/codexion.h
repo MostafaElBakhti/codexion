@@ -35,9 +35,9 @@ typedef struct s_data
 
 typedef struct s_request
 {
-	int		coder_id;
-	long	request_time;
-	long	deadline;
+	int				coder_id;
+	long			request_time;
+	long			deadline;
 	unsigned long	sequence;
 }	t_request;
 

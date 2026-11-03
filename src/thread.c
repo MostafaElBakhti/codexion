@@ -6,7 +6,7 @@
 /*   By: mel-bakh <mel-bakh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/27 00:00:00 by mel-bakh          #+#    #+#             */
-/*   Updated: 2026/10/27 00:00:00 by mel-bakh         ###   ########.fr       */
+/*   Updated: 2026/11/01 20:49:36 by mel-bakh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ static void	record_compile(t_coder *coder)
 	t_simulation	*sim;
 
 	sim = coder->sim;
-	/* Caller holds arbiter_mutex, including the completion stop decision. */
 	coder->completed_compiles++;
 	if (coder->completed_compiles == sim->config.number_of_compiles_required)
 		sim->completed_coders++;
@@ -55,7 +54,7 @@ static int	run_phase(t_coder *coder, char *state, int duration)
 {
 	t_simulation	*sim;
 	long			end;
-	int			result;
+	int				result;
 
 	sim = coder->sim;
 	if (pthread_mutex_lock(&sim->arbiter_mutex) != 0)

@@ -6,13 +6,12 @@
 /*   By: mel-bakh <mel-bakh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/27 00:00:00 by mel-bakh          #+#    #+#             */
-/*   Updated: 2026/10/27 00:00:00 by mel-bakh         ###   ########.fr       */
+/*   Updated: 2026/11/01 20:19:17 by mel-bakh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-/* Called with arbiter_mutex held, before the request enters either heap. */
 int	wait_initial_turn(t_coder *coder)
 {
 	t_simulation	*sim;
